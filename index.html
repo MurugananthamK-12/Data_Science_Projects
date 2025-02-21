@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recommendation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .results th, .results td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .results th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Music Recommendation System</h1>
+        <div class="form-group">
+            <label for="track-name">Track Name:</label>
+            <input type="text" id="track-name" placeholder="Enter track name">
+        </div>
+        <div class="form-group">
+            <label for="condition">Condition:</label>
+            <select id="condition">
+                <option value="asd">ASD</option>
+                <option value="adhd">ADHD</option>
+                <option value="down_syndrome">Down Syndrome</option>
+                <option value="sensory_processing_disorder">Sensory Processing Disorder</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="num-rec">Number of Recommendations:</label>
+            <input type="number" id="num-rec" value="5" min="1">
+        </div>
+        <button onclick="getRecommendations()">Get Recommendations</button>
+
+        <div class="results" id="results">
+            <!-- Results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        async function getRecommendations() {
+            const trackName = document.getElementById('track-name').value;
+            const condition = document.getElementById('condition').value;
+            const numRec = document.getElementById('num-rec').value;
+            
+            const response = await fetch(`/recommend?track_name=${encodeURIComponent(trackName)}&condition=${encodeURIComponent(condition)}&num_rec=${numRec}`);
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayResults(data);
+            } else {
+                document.getElementById('results').innerHTML = 'Error fetching recommendations.';
+            }
+        }
+
+        function displayResults(songs) {
+            const resultsDiv = document.getElementById('results');
+            if (songs.length === 0) {
+                resultsDiv.innerHTML = 'No recommendations found.';
+                return;
+            }
+            let html = '<table><thead><tr><th>Artist</th><th>Track Name</th></tr></thead><tbody>';
+            songs.forEach(song => {
+                html += `<tr><td>${song.artists}</td><td>${song.track_name}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
